@@ -4,12 +4,12 @@ local UserInputService = game:GetService("UserInputService")
 local isPressing = false
 local counter = 0
 local clickCallbacks = {}
-local holdBcallbacks = {}
-
+local holdcallbacks = {}
+local postCallBacks = {}
 function InputMouse()
 	while task.wait() do
 		if counter > 15 and isPressing then
-			for i,v in holdBcallbacks do
+			for i,v in holdcallbacks do
 				coroutine.wrap(v)()
 			end		
 		end
@@ -18,6 +18,7 @@ function InputMouse()
 
 end
 local Coroutine
+
 UserInputService.InputBegan:Connect(function(input:InputObject,gameProccess:boolean)
 	if gameProccess then return end
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -39,7 +40,10 @@ UserInputService.InputEnded:Connect(function(input:InputObject,gameProccess:bool
 			for i,v in clickCallbacks do
 				coroutine.wrap(v)()
 			end	
-
+		else
+			for i,v in postCallBacks do
+				coroutine.wrap(v)()
+			end
 		end
 	end
 end)
@@ -49,14 +53,11 @@ function inputManager.OnClick(callback)
 end
 
 function inputManager.OnHold(callback)
-	table.insert(holdBcallbacks,callback)
+	table.insert(holdcallbacks,callback)
 end
-inputManager.OnHold(function()
-	print("holding")
-end)
-inputManager.OnClick(function()
-	print("click")
-end)
-
+--Called when player stop holding left click
+function inputManager.OnHoldPost(callback)
+	table.insert(postCallBacks,callback)	
+end
 --TODO mobile support
 return inputManager
